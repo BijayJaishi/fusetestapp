@@ -15,9 +15,8 @@ class MyApp extends StatelessWidget {
     const Choice(title: 'Edit Post', icon: Icons.edit),
   ];
 
-   onItemMenuPress(choice) {
-    if (choice.title == 'Edit Post') {
-    }
+  onItemMenuPress(choice) {
+    if (choice.title == 'Edit Post') {}
   }
 
   @override
@@ -189,13 +188,19 @@ class MyApp extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(icon: Icon(Icons.edit), onPressed: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EditPost(
-                            document['type'],document['content'],document['caption'],document['postId'],document['urls'])));
-              })
+              IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditPost(
+                                document['type'],
+                                document['content'],
+                                document['caption'],
+                                document['postId'],
+                                document['urls'])));
+                  })
               // PopupMenuButton<Choice>(
               //   onSelected: onItemMenuPress,
               //   itemBuilder: (BuildContext context) {
@@ -234,171 +239,173 @@ class MyApp extends StatelessWidget {
                     document['content'],
                   ),
                 )
-              : (document['type'] == 1)
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        document['caption'] != ''
-                            ? Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0,
-                                      left: 10,
-                                      right: 10,
-                                      bottom: 10),
-                                  child: Text(
-                                    document['caption'],
-                                  ),
-                                ),
-                              )
-                            : Container(),
-                        Container(
-                          child: FlatButton(
-                            child: Material(
-                              child: CachedNetworkImage(
-                                placeholder: (context, url) => Center(
-                                  child: Container(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.lightBlue),
-                                    ),
-                                    width: 200.0,
-                                    height: 200.0,
-                                    padding: EdgeInsets.all(70.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8.0),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Material(
-                                  child: Image.asset(
-                                    'assets/img_not_available.jpeg',
-                                    width: double.infinity,
-                                    height: 250,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(8.0),
-                                  ),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                                imageUrl: document['content'],
-                                height: 250,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
+              // : (document['type'] == 1)
+              //     ? Column(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           document['caption'] != ''
+              //               ? Container(
+              //                   child: Padding(
+              //                     padding: const EdgeInsets.only(
+              //                         top: 4.0,
+              //                         left: 10,
+              //                         right: 10,
+              //                         bottom: 10),
+              //                     child: Text(
+              //                       document['caption'],
+              //                     ),
+              //                   ),
+              //                 )
+              //               : Container(),
+              //           Container(
+              //             child: FlatButton(
+              //               child: Material(
+              //                 child: CachedNetworkImage(
+              //                   placeholder: (context, url) => Center(
+              //                     child: Container(
+              //                       child: CircularProgressIndicator(
+              //                         valueColor: AlwaysStoppedAnimation<Color>(
+              //                             Colors.lightBlue),
+              //                       ),
+              //                       width: 200.0,
+              //                       height: 200.0,
+              //                       padding: EdgeInsets.all(70.0),
+              //                       decoration: BoxDecoration(
+              //                         color: Colors.transparent,
+              //                         borderRadius: BorderRadius.all(
+              //                           Radius.circular(8.0),
+              //                         ),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   errorWidget: (context, url, error) => Material(
+              //                     child: Image.asset(
+              //                       'assets/img_not_available.jpeg',
+              //                       width: double.infinity,
+              //                       height: 250,
+              //                       fit: BoxFit.cover,
+              //                     ),
+              //                     borderRadius: BorderRadius.all(
+              //                       Radius.circular(8.0),
+              //                     ),
+              //                     clipBehavior: Clip.hardEdge,
+              //                   ),
+              //                   imageUrl: document['content'],
+              //                   height: 250,
+              //                   width: double.infinity,
+              //                   fit: BoxFit.cover,
+              //                 ),
+              //                 borderRadius:
+              //                     BorderRadius.all(Radius.circular(8.0)),
+              //                 clipBehavior: Clip.hardEdge,
+              //               ),
+              //               onPressed: () {
+              //                 Navigator.push(
+              //                     context,
+              //                     MaterialPageRoute(
+              //                         builder: (context) =>
+              //                             FullPhoto(url: document['content'])));
+              //               },
+              //               padding: EdgeInsets.only(
+              //                   bottom: 3, left: 3, right: 3, top: 2),
+              //             ),
+              //           )
+              //         ],
+              //       )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    document['caption'] != ''
+                        ? Container(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 4.0, left: 10, right: 10, bottom: 10),
+                              child: Text(
+                                document['caption'],
                               ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8.0)),
-                              clipBehavior: Clip.hardEdge,
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          FullPhoto(url: document['content'])));
-                            },
-                            padding: EdgeInsets.only(
-                                bottom: 3, left: 3, right: 3, top: 2),
-                          ),
-                        )
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        document['caption'] != ''
-                            ? Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4.0,
-                                      left: 10,
-                                      right: 10,
-                                      bottom: 10),
-                                  child: Text(
-                                    document['caption'],
-                                  ),
-                                ),
-                              )
-                            : Container(),
-                        Container(
-                          height: document['urls'].length <= 2 ? 170 : 350,
-                          child: GridView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: document['urls'].length >= 4
-                                ? 4
-                                : document['urls'].length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 4.0,
-                                    mainAxisSpacing: 4.0),
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                child: FlatButton(
-                                  child: Material(
-                                    child: CachedNetworkImage(
-                                      placeholder: (context, url) => Center(
-                                        child: Container(
-                                          child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    Colors.lightBlue),
-                                          ),
-                                          width: 200.0,
-                                          height: 200.0,
-                                          padding: EdgeInsets.all(70.0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.transparent,
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(8.0),
+                          )
+                        : Container(),
+                    Container(
+                      width: config.App(context).appWidth(100),
+                      height: document['urls'].length <= 2
+                          ? config.App(context).appWidth(50)
+                          : config.App(context).appWidth(96),
+                      child: GridView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: document['urls'].length >= 4
+                                  ? 4
+                                  : document['urls'].length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 4.0,
+                                      mainAxisSpacing: 4.0),
+                              itemBuilder: (BuildContext context, int index) {
+                                return Container(
+                                  child: FlatButton(
+                                    child: Material(
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) => Center(
+                                          child: Container(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.lightBlue),
+                                            ),
+                                            width: 200.0,
+                                            height: 200.0,
+                                            padding: EdgeInsets.all(70.0),
+                                            decoration: BoxDecoration(
+                                              color: Colors.transparent,
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(8.0),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Material(
-                                        child: Image.asset(
-                                          'assets/img_not_available.jpeg',
-                                          width: double.infinity,
-                                          height: 250,
-                                          fit: BoxFit.cover,
+                                        errorWidget: (context, url, error) =>
+                                            Material(
+                                          child: Image.asset(
+                                            'assets/img_not_available.jpeg',
+                                            width: double.infinity,
+                                            height: 250,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(8.0),
+                                          ),
+                                          clipBehavior: Clip.hardEdge,
                                         ),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(8.0),
-                                        ),
-                                        clipBehavior: Clip.hardEdge,
+                                        imageUrl: document['urls'][index],
+                                        height: 250,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
                                       ),
-                                      imageUrl: document['urls'][index],
-                                      height: 250,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      clipBehavior: Clip.hardEdge,
                                     ),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8.0)),
-                                    clipBehavior: Clip.hardEdge,
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => FullPhoto(
+                                                  url: document['urls']
+                                                      [index])));
+                                    },
+                                    padding: EdgeInsets.only(
+                                        bottom: 3, left: 3, right: 3, top: 2),
                                   ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => FullPhoto(
-                                                url: document['urls'][index])));
-                                  },
-                                  padding: EdgeInsets.only(
-                                      bottom: 3, left: 3, right: 3, top: 2),
-                                ),
-                              );
-                              // return Card(
-                              //     child: Image.network(document['urls'][index]));
-                            },
-                          ),
-                        ),
-                      ],
-                    )
+                                );
+                                // return Card(
+                                //     child: Image.network(document['urls'][index]));
+                              },
+                            )
+
+                    ),
+                  ],
+                )
         ],
       ),
     );

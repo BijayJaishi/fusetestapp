@@ -49,25 +49,25 @@ class _AddPostState extends State<AddPost> {
     setState(() => cameraImageFile = null);
   }
 
-  Future uploadCameraFile(String caption) async {
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    StorageReference reference =
-        FirebaseStorage.instance.ref().child('StoryImages/Camera/$fileName');
-    StorageUploadTask uploadTask = reference.putFile(cameraImageFile);
-    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
-    storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-      cameraImageUrl = downloadUrl;
-      setState(() {
-        isLoading = false;
-        onPostData(cameraImageUrl, 1, caption, null);
-      });
-    }, onError: (err) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg: 'This file is not an image');
-    });
-  }
+  // Future uploadCameraFile(String caption) async {
+  //   String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+  //   StorageReference reference =
+  //       FirebaseStorage.instance.ref().child('StoryImages/Camera/$fileName');
+  //   StorageUploadTask uploadTask = reference.putFile(cameraImageFile);
+  //   StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+  //   storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
+  //     cameraImageUrl = downloadUrl;
+  //     setState(() {
+  //       isLoading = false;
+  //       onPostData(cameraImageUrl, 1, caption, null);
+  //     });
+  //   }, onError: (err) {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //     Fluttertoast.showToast(msg: 'This file is not an image');
+  //   });
+  // }
 
   void uploadGalleryImages(String caption) {
     for (var imageFilee in images) {
@@ -138,18 +138,20 @@ class _AddPostState extends State<AddPost> {
   }
 
   Widget mainContent(context) {
-    print('camera:$cameraImageFile');
-    print('camera2:$images');
-    print('length:${images.length}');
-    print('text:${textPost.text}');
+    // print('camera:$cameraImageFile');
+    // print('camera2:$images');
+    // print('length:${images.length}');
+    // print('text:${textPost.text}');
     return Stack(
       fit: StackFit.expand,
       children: [
-        cameraImageFile != null
-            ? getCameraPhoto(context)
-            : images.length != 0
+        // cameraImageFile != null
+        //     ? getCameraPhoto(context)
+        //     :
+    images.length != 0
                 ? getGalleryPhoto(context)
-                : Container(
+                :
+    Container(
                     margin: EdgeInsets.only(bottom: 65),
                     // padding: EdgeInsets.only(bottom: 15),
                     child: SingleChildScrollView(
@@ -214,19 +216,19 @@ class _AddPostState extends State<AddPost> {
                   ),
                   Row(
                     children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.camera_alt,
-                          size: 28,
-                          color: Colors.lightBlue,
-                        ),
-                        onPressed: () {
-                          getCameraImage();
-                        },
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
+                      // IconButton(
+                      //   icon: Icon(
+                      //     Icons.camera_alt,
+                      //     size: 28,
+                      //     color: Colors.lightBlue,
+                      //   ),
+                      //   onPressed: () {
+                      //     getCameraImage();
+                      //   },
+                      // ),
+                      // SizedBox(
+                      //   width: 15,
+                      // ),
                       IconButton(
                         icon: Icon(
                           Icons.photo,
@@ -249,73 +251,73 @@ class _AddPostState extends State<AddPost> {
     );
   }
 
-  Widget getCameraPhoto(context) {
-    print('I am here');
-    return Container(
-      margin: EdgeInsets.only(bottom: 65),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              // height: config.App(context).appHeight(80),
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: TextField(
-                  maxLines: null,
-                  // expands: true,
-                  keyboardType: TextInputType.multiline,
-                  style: TextStyle(color: Colors.black, fontSize: 18.0),
-                  controller: textCameraCaption,
-                  decoration: new InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    hintText: "Say Something About Image",
-                    hintStyle: TextStyle(color: Colors.grey),
-                    contentPadding: EdgeInsets.all(5.0),
-                  ),
-                  textAlign: TextAlign.start,
-                  autofocus: false,
-                ),
-              ),
-            ),
-            Container(
-              height: config.App(context).appHeight(70),
-              margin: EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-//                              border: Border.all(width : 10.0,color: Colors.transparent),
-                  borderRadius: BorderRadius.circular(0.0),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Color.fromARGB(80, 0, 0, 0),
-                        blurRadius: 5.0,
-                        offset: Offset(5.0, 5.0))
-                  ],
-                  image: DecorationImage(
-                      fit: BoxFit.cover, image: FileImage(cameraImageFile))),
-              width: MediaQuery.of(context).size.width,
-              child: Container(
-                margin: EdgeInsets.only(top: 5.0, right: 5),
-                alignment: Alignment.topRight,
-                child: GestureDetector(
-                  onTap: () => _clear(),
-                  child: CircleAvatar(
-                    radius: 15,
-                    child: Icon(
-                      Icons.clear,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+//   Widget getCameraPhoto(context) {
+//     print('I am here');
+//     return Container(
+//       margin: EdgeInsets.only(bottom: 65),
+//       child: SingleChildScrollView(
+//         child: Column(
+//           children: [
+//             Container(
+//               // height: config.App(context).appHeight(80),
+//               child: Padding(
+//                 padding: const EdgeInsets.all(5.0),
+//                 child: TextField(
+//                   maxLines: null,
+//                   // expands: true,
+//                   keyboardType: TextInputType.multiline,
+//                   style: TextStyle(color: Colors.black, fontSize: 18.0),
+//                   controller: textCameraCaption,
+//                   decoration: new InputDecoration(
+//                     border: InputBorder.none,
+//                     focusedBorder: InputBorder.none,
+//                     enabledBorder: InputBorder.none,
+//                     errorBorder: InputBorder.none,
+//                     disabledBorder: InputBorder.none,
+//                     hintText: "Say Something About Image",
+//                     hintStyle: TextStyle(color: Colors.grey),
+//                     contentPadding: EdgeInsets.all(5.0),
+//                   ),
+//                   textAlign: TextAlign.start,
+//                   autofocus: false,
+//                 ),
+//               ),
+//             ),
+//             Container(
+//               height: config.App(context).appHeight(70),
+//               margin: EdgeInsets.all(10.0),
+//               decoration: BoxDecoration(
+// //                              border: Border.all(width : 10.0,color: Colors.transparent),
+//                   borderRadius: BorderRadius.circular(0.0),
+//                   boxShadow: [
+//                     BoxShadow(
+//                         color: Color.fromARGB(80, 0, 0, 0),
+//                         blurRadius: 5.0,
+//                         offset: Offset(5.0, 5.0))
+//                   ],
+//                   image: DecorationImage(
+//                       fit: BoxFit.cover, image: FileImage(cameraImageFile))),
+//               width: MediaQuery.of(context).size.width,
+//               child: Container(
+//                 margin: EdgeInsets.only(top: 5.0, right: 5),
+//                 alignment: Alignment.topRight,
+//                 child: GestureDetector(
+//                   onTap: () => _clear(),
+//                   child: CircleAvatar(
+//                     radius: 15,
+//                     child: Icon(
+//                       Icons.clear,
+//                       color: Colors.white,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 
   Widget getGalleryPhoto(context) {
     return Container(
@@ -339,7 +341,7 @@ class _AddPostState extends State<AddPost> {
                     enabledBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
                     disabledBorder: InputBorder.none,
-                    hintText: "Say Something About Images",
+                    hintText: "Say Something About Image",
                     hintStyle: TextStyle(color: Colors.grey),
                     contentPadding: EdgeInsets.all(5.0),
                   ),
@@ -373,13 +375,7 @@ class _AddPostState extends State<AddPost> {
   }
 
   void validInputs() {
-
-    if(cameraImageFile != null){
-      setState(() {
-        this.isLoading = true;
-      });
-      uploadCameraFile(textCameraCaption.text);
-    }else if(images.length !=0){
+    if(images.length !=0){
       setState(() {
         this.isLoading = true;
       });
@@ -392,6 +388,25 @@ class _AddPostState extends State<AddPost> {
     }else{
       Fluttertoast.showToast(msg: 'Nothing to Post');
     }
+
+    // if(cameraImageFile != null){
+    //   setState(() {
+    //     this.isLoading = true;
+    //   });
+    //   uploadCameraFile(textCameraCaption.text);
+    // }else if(images.length !=0){
+    //   setState(() {
+    //     this.isLoading = true;
+    //   });
+    //   uploadGalleryImages(textGalleryCaption.text);
+    // }else if(textPost.text.trim()!= ''){
+    //   setState(() {
+    //     this.isLoading = true;
+    //   });
+    //   onPostData(textPost.text, 0, '', null);
+    // }else{
+    //   Fluttertoast.showToast(msg: 'Nothing to Post');
+    // }
     //
     // if (textPost.text.trim() != '' && cameraImageFile == null) {
     //   print('I am text');
@@ -425,7 +440,7 @@ class _AddPostState extends State<AddPost> {
     try {
       resultList = await MultiImagePicker.pickImages(
         maxImages: 10,
-        // enableCamera: true,
+        enableCamera: true,
         selectedAssets: images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
@@ -457,7 +472,7 @@ class _AddPostState extends State<AddPost> {
 
   Widget buildGridView() {
     return GridView.count(
-      crossAxisCount: images.length == 2 || images.length == 1 ? 1 : 2,
+      crossAxisCount: images.length <= 2 ? 1 : 2,
       scrollDirection: Axis.vertical,
       children: List.generate(images.length, (index) {
         Asset asset = images[index];

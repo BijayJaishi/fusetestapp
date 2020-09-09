@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:fusetestapp/config/appConfig.dart' as config;
 
 import '../app.dart';
+import 'FullPhoto.dart';
 
 class EditPost extends StatefulWidget {
   final type, content, caption,code;
@@ -78,9 +80,8 @@ class _EditPostState extends State<EditPost> {
 
     print('newphotourl:$photoUrl');
     print('newCaption:$caption');
-    print('oldCaption:$caption');
+    print('oldCaption:${widget.caption}');
 
-    print('newCaption:$caption');
     if( photoUrl!=null && caption == widget.caption){
       setState(() {
         isLoading = false;
@@ -137,7 +138,7 @@ class _EditPostState extends State<EditPost> {
       isLoading = true;
     });
 
-   if(content != widget.content) {
+   if(type==0?content != widget.content:(content != widget.content || caption != widget.caption)) {
      Firestore.instance
          .collection('Stories')
          .document('12')
@@ -220,9 +221,10 @@ class _EditPostState extends State<EditPost> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        (photoUrl != null && widget.type == 1 )|| (cameraImageFile != null)
-            ? getCameraPhoto(context)
-            : widget.urls != null && widget.type == 2
+        // (photoUrl != null && widget.type == 1 )|| (cameraImageFile != null)
+        //     ? getCameraPhoto(context)
+        //     :
+    widget.urls != null && widget.type == 2
                 ? getGalleryPhoto(context)
                 : text!=null?Container(
                     margin: EdgeInsets.only(bottom: 65),
@@ -260,7 +262,7 @@ class _EditPostState extends State<EditPost> {
                       ),
                     ),
                   ):Container(child: Center(child: Text('Nothing to show'),),),
-        Positioned(
+         Positioned(
           left: 0,
           right: 0,
           bottom: 0,
@@ -293,19 +295,19 @@ class _EditPostState extends State<EditPost> {
                   ),
                   Row(
                     children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.camera_alt,
-                          size: 28,
-                          color: Colors.lightBlue,
-                        ),
-                        onPressed: () {
-                          getCameraImage();
-                        },
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
+                      // IconButton(
+                      //   icon: Icon(
+                      //     Icons.camera_alt,
+                      //     size: 28,
+                      //     color: Colors.lightBlue,
+                      //   ),
+                      //   onPressed: () {
+                      //     getCameraImage();
+                      //   },
+                      // ),
+                      // SizedBox(
+                      //   width: 15,
+                      // ),
                       IconButton(
                         icon: Icon(
                           Icons.photo,
@@ -328,109 +330,109 @@ class _EditPostState extends State<EditPost> {
     );
   }
 
-  Widget getCameraPhoto(context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 65),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              // height: config.App(context).appHeight(80),
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: TextField(
-                  maxLines: null,
-                  // expands: true,
-                  keyboardType: TextInputType.multiline,
-                  style: TextStyle(color: Colors.black, fontSize: 18.0),
-                  controller: editTextCameraCaption,
-                  onChanged: (value) {
-                    cameraCap = value;
-                  },
-                  focusNode: focusNodeCameraCap,
-                  decoration: new InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    hintText: "Say Something About Image",
-                    hintStyle: TextStyle(color: Colors.grey),
-                    contentPadding: EdgeInsets.all(5.0),
-                  ),
-                  textAlign: TextAlign.start,
-                  autofocus: false,
-                ),
-              ),
-            ),
-            photoUrl != null
-                ? Container(
-                    height: config.App(context).appHeight(70),
-                    margin: EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-//                              border: Border.all(width : 10.0,color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(0.0),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Color.fromARGB(80, 0, 0, 0),
-                              blurRadius: 5.0,
-                              offset: Offset(5.0, 5.0))
-                        ],
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(photoUrl))),
-                    width: MediaQuery.of(context).size.width,
-                    child: Container(
-                      margin: EdgeInsets.only(top: 5.0, right: 5),
-                      alignment: Alignment.topRight,
-                      child: GestureDetector(
-                        onTap: () => _clear(),
-                        child: CircleAvatar(
-                          radius: 15,
-                          child: Icon(
-                            Icons.clear,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                : cameraImageFile!= null? Container(
-                    height: config.App(context).appHeight(70),
-                    margin: EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-//                              border: Border.all(width : 10.0,color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(0.0),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Color.fromARGB(80, 0, 0, 0),
-                              blurRadius: 5.0,
-                              offset: Offset(5.0, 5.0))
-                        ],
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: FileImage(cameraImageFile))),
-                    width: MediaQuery.of(context).size.width,
-                    child: Container(
-                      margin: EdgeInsets.only(top: 5.0, right: 5),
-                      alignment: Alignment.topRight,
-                      child: GestureDetector(
-                        onTap: () => _clear(),
-                        child: CircleAvatar(
-                          radius: 15,
-                          child: Icon(
-                            Icons.clear,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ):Container(child: Text('No Image'),),
-          ],
-        ),
-      ),
-    );
-  }
+//   Widget getCameraPhoto(context) {
+//     return Container(
+//       margin: EdgeInsets.only(bottom: 65),
+//       child: SingleChildScrollView(
+//         child: Column(
+//           children: [
+//             Container(
+//               // height: config.App(context).appHeight(80),
+//               child: Padding(
+//                 padding: const EdgeInsets.all(5.0),
+//                 child: TextField(
+//                   maxLines: null,
+//                   // expands: true,
+//                   keyboardType: TextInputType.multiline,
+//                   style: TextStyle(color: Colors.black, fontSize: 18.0),
+//                   controller: editTextCameraCaption,
+//                   onChanged: (value) {
+//                     cameraCap = value;
+//                   },
+//                   focusNode: focusNodeCameraCap,
+//                   decoration: new InputDecoration(
+//                     border: InputBorder.none,
+//                     focusedBorder: InputBorder.none,
+//                     enabledBorder: InputBorder.none,
+//                     errorBorder: InputBorder.none,
+//                     disabledBorder: InputBorder.none,
+//                     hintText: "Say Something About Image",
+//                     hintStyle: TextStyle(color: Colors.grey),
+//                     contentPadding: EdgeInsets.all(5.0),
+//                   ),
+//                   textAlign: TextAlign.start,
+//                   autofocus: false,
+//                 ),
+//               ),
+//             ),
+//             photoUrl != null
+//                 ? Container(
+//                     height: config.App(context).appHeight(70),
+//                     margin: EdgeInsets.all(10.0),
+//                     decoration: BoxDecoration(
+// //                              border: Border.all(width : 10.0,color: Colors.transparent),
+//                         borderRadius: BorderRadius.circular(0.0),
+//                         boxShadow: [
+//                           BoxShadow(
+//                               color: Color.fromARGB(80, 0, 0, 0),
+//                               blurRadius: 5.0,
+//                               offset: Offset(5.0, 5.0))
+//                         ],
+//                         image: DecorationImage(
+//                             fit: BoxFit.cover,
+//                             image: NetworkImage(photoUrl))),
+//                     width: MediaQuery.of(context).size.width,
+//                     child: Container(
+//                       margin: EdgeInsets.only(top: 5.0, right: 5),
+//                       alignment: Alignment.topRight,
+//                       child: GestureDetector(
+//                         onTap: () => _clear(),
+//                         child: CircleAvatar(
+//                           radius: 15,
+//                           child: Icon(
+//                             Icons.clear,
+//                             color: Colors.white,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   )
+//                 : cameraImageFile!= null? Container(
+//                     height: config.App(context).appHeight(70),
+//                     margin: EdgeInsets.all(10.0),
+//                     decoration: BoxDecoration(
+// //                              border: Border.all(width : 10.0,color: Colors.transparent),
+//                         borderRadius: BorderRadius.circular(0.0),
+//                         boxShadow: [
+//                           BoxShadow(
+//                               color: Color.fromARGB(80, 0, 0, 0),
+//                               blurRadius: 5.0,
+//                               offset: Offset(5.0, 5.0))
+//                         ],
+//                         image: DecorationImage(
+//                             fit: BoxFit.cover,
+//                             image: FileImage(cameraImageFile))),
+//                     width: MediaQuery.of(context).size.width,
+//                     child: Container(
+//                       margin: EdgeInsets.only(top: 5.0, right: 5),
+//                       alignment: Alignment.topRight,
+//                       child: GestureDetector(
+//                         onTap: () => _clear(),
+//                         child: CircleAvatar(
+//                           radius: 15,
+//                           child: Icon(
+//                             Icons.clear,
+//                             color: Colors.white,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ):Container(child: Text('No Image'),),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 
   Widget getGalleryPhoto(context) {
     return Container(
@@ -467,9 +469,7 @@ class _EditPostState extends State<EditPost> {
                 ),
               ),
             ),
-            Container(
-                height: config.App(context).appHeight(75),
-                child: widget.urls!=null?buildNewGridView():buildGridView()),
+            widget.urls!=null?buildNewGridView():buildGridView(),
           ],
         ),
       ),
@@ -590,17 +590,77 @@ class _EditPostState extends State<EditPost> {
 
   Widget buildNewGridView() {
     print('am here');
-    return GridView.count(
-      crossAxisCount: widget.urls.length == 2 || widget.urls.length == 1 ? 1 : 2,
-      scrollDirection: Axis.vertical,
-      children: List.generate(widget.urls.length, (index) {
-
-        return Card(
-          child: Image.network(
-           widget.urls[index]
-          ),
-        );
-      }),
+   return Container(
+       height: config.App(context).appHeight(75),
+        child: GridView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: widget.urls.length,
+          gridDelegate:
+          SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount:  2,
+              crossAxisSpacing: 4.0,
+              mainAxisSpacing: 0.0),
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              child: FlatButton(
+                child: Material(
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => Center(
+                      child: Container(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                          AlwaysStoppedAnimation<Color>(
+                              Colors.lightBlue),
+                        ),
+                        width: 200.0,
+                        height: 200.0,
+                        padding: EdgeInsets.all(70.0),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        Material(
+                          child: Image.asset(
+                            'assets/img_not_available.jpeg',
+                            width: double.infinity,
+                            height: 250,
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(8.0),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                        ),
+                    imageUrl: widget.urls[index],
+                    height: 250,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(8.0)),
+                  clipBehavior: Clip.hardEdge,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullPhoto(
+                              url: widget.urls
+                              [index])));
+                },
+                padding: EdgeInsets.only(
+                    bottom: 3, left: 3, right: 3, top: 2),
+              ),
+            );
+            // return Card(
+            //     child: Image.network(document['urls'][index]));
+          },
+        )
     );
   }
 
