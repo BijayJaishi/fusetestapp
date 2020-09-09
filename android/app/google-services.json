@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "70892936706",
+    "firebase_url": "https://testfacebook-dd6b7.firebaseio.com",
+    "project_id": "testfacebook-dd6b7",
+    "storage_bucket": "testfacebook-dd6b7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:70892936706:android:fd040398eab681b4fc911b",
+        "android_client_info": {
+          "package_name": "com.example.fusetestapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "70892936706-c6kccpqhh6ba85an910vc45vauli43vg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA3SGCEUVI9Ls6DC-Tm0dIP4rrOTgzmIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "70892936706-c6kccpqhh6ba85an910vc45vauli43vg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
