@@ -96,8 +96,10 @@ class _EditPostState extends State<EditPost> {
         });
 
         Fluttertoast.showToast(msg: "Update success");
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyApp()));
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (BuildContext context) => MyApp()),
+                (Route<dynamic> route) => false);
       }).catchError((err) {
         setState(() {
           isLoading = false;
