@@ -328,24 +328,48 @@ class MyApp extends StatelessWidget {
                         : Container(),
                     Container(
                       width: config.App(context).appWidth(100),
-                      height: document['urls'].length <= 2
+                      height: document['urls'].length == 2
                           ? config.App(context).appWidth(50)
                           : config.App(context).appWidth(96),
                       child: GridView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: document['urls'].length >= 4
-                                  ? 4
-                                  : document['urls'].length,
+                        scrollDirection:Axis.horizontal,
+                              itemCount:
+                        // document['urls'].length >= 4
+                              //     ? 4
+                              //     :
+                            document['urls'].length,
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
+                                      crossAxisCount: document['urls'].length <= 2?1:2,
                                       crossAxisSpacing: 4.0,
                                       mainAxisSpacing: 4.0),
                               itemBuilder: (BuildContext context, int index) {
-                                return Container(
-                                  child: FlatButton(
+                                return InkWell(
+                                  highlightColor: Colors.lightBlue,
+                                  onTap: (){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                FullPhoto(url: document['urls'][index])));
+                                  },
+                                  child: Container(
+                                      decoration: BoxDecoration(
+                                     border: Border.all(width : 4.0,color: Colors.transparent),
+                                        borderRadius: BorderRadius.circular(20.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Color.fromARGB(60, 0, 0, 0),
+                                              blurRadius: 5.0,
+                                              offset: Offset(5.0, 5.0)
+                                          )
+                                        ],
+                                      ),
+                                    margin: EdgeInsets.all(5),
                                     child: Material(
-                                      child: CachedNetworkImage(
+                                      elevation: 4,
+                                      child:
+                                      CachedNetworkImage(
                                         placeholder: (context, url) => Center(
                                           child: Container(
                                             child: CircularProgressIndicator(
@@ -359,7 +383,7 @@ class MyApp extends StatelessWidget {
                                             decoration: BoxDecoration(
                                               color: Colors.transparent,
                                               borderRadius: BorderRadius.all(
-                                                Radius.circular(8.0),
+                                                Radius.circular(20.0),
                                               ),
                                             ),
                                           ),
@@ -373,7 +397,7 @@ class MyApp extends StatelessWidget {
                                             fit: BoxFit.cover,
                                           ),
                                           borderRadius: BorderRadius.all(
-                                            Radius.circular(8.0),
+                                            Radius.circular(20.0),
                                           ),
                                           clipBehavior: Clip.hardEdge,
                                         ),
@@ -383,23 +407,11 @@ class MyApp extends StatelessWidget {
                                         fit: BoxFit.cover,
                                       ),
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(8.0)),
+                                          Radius.circular(20.0)),
                                       clipBehavior: Clip.hardEdge,
                                     ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => FullPhoto(
-                                                  url: document['urls']
-                                                      [index])));
-                                    },
-                                    padding: EdgeInsets.only(
-                                        bottom: 3, left: 3, right: 3, top: 2),
                                   ),
                                 );
-                                // return Card(
-                                //     child: Image.network(document['urls'][index]));
                               },
                             )
 
