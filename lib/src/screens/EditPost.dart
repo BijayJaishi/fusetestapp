@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:fusetestapp/config/appConfig.dart' as config;
 
@@ -23,141 +21,75 @@ class EditPost extends StatefulWidget {
 
 class _EditPostState extends State<EditPost> {
   TextEditingController editTextPost;
-  TextEditingController editTextCameraCaption;
   TextEditingController editTextGalleryCaption;
 
-  File cameraImageFile;
-  String cameraImageUrl;
   List<Asset> images = List<Asset>();
   List<String> imageUrls = <String>[];
   String _error = 'No Error Detected';
   bool isLoading = false;
   String galleryCap = '';
   String text = '';
-  String photoUrl = '';
-  String cameraCap = '';
-  // List<String> pUrls = <String>[];
+  var picUrls = [];
 
   final FocusNode focusNodeText = new FocusNode();
-  final FocusNode focusNodeCameraCap = new FocusNode();
   final FocusNode focusNodeGalleryCap = new FocusNode();
 
-  Future getCameraImage() async {
-    setState(() {
-      isLoading = true;
-    });
-    File selected = await ImagePicker.pickImage(
-        source: ImageSource.camera, imageQuality: 72);
-
-    if (selected != null) {
-      setState(() {
-        cameraImageFile = selected;
-        isLoading = false;
-      });
-    }
-
-    // if (cameraImageFile != null) {
-    //   setState(() {
-    //
-    //     isLoading = false;
-    //   });
-
-    //   // uploadCameraFile(caption);
-    // } else {
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // }
-  }
-
-  Future uploadCameraFile(String caption) async {
-    print('newphotourl:$photoUrl');
-    print('newCaption:$caption');
-    print('oldCaption:${widget.caption}');
-
-    if (photoUrl != null && caption == widget.caption) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg: 'Nothing to Update');
-    } else if (photoUrl != null && caption != widget.caption) {
-      handleUpdateData(photoUrl, caption, null, 1);
-    } else {
-      print('newphotourl:$photoUrl');
-      print('newCaption:$caption');
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      StorageReference reference =
-          FirebaseStorage.instance.ref().child('StoryImages/Camera/$fileName');
-      StorageUploadTask uploadTask = reference.putFile(cameraImageFile);
-      StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
-      storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-        cameraImageUrl = downloadUrl;
-        setState(() {
-          isLoading = false;
-          handleUpdateData(
-              photoUrl != null ? photoUrl : cameraImageUrl, caption, null, 1);
-        });
-      }, onError: (err) {
-        setState(() {
-          isLoading = false;
-        });
-        Fluttertoast.showToast(msg: 'This file is not an image');
-      });
-    }
-  }
+  //uploads new images with existing  images
 
   void uploadGalleryImages(String caption) {
-    if (caption != widget.caption && images.isEmpty) {
-      handleUpdateData('', caption, widget.urls, 2);
-    } else if (caption != widget.caption && images.isNotEmpty) {
-      print('here');
+    if (images.isNotEmpty) {
+      var allUrl = picUrls;
       for (var imageFilee in images) {
-        print("imagesfiles:$imageFilee");
         postImage(imageFilee).then((downloadUrl) {
-          imageUrls.add(downloadUrl.toString());
-          for(var pUrl in widget.urls){
-            imageUrls.add(pUrl.toString());
+          allUrl.add(downloadUrl.toString());
+          if (allUrl.isNotEmpty) {
+            handleUpdateData('', caption, allUrl, 2);
+          } else {
+            Fluttertoast.showToast(msg: 'Select Some Images');
+            setState(() {
+              isLoading = false;
+            });
           }
-          print('images:$imageUrls');
-          handleUpdateData('', caption, imageUrls, 2);
-          // if (imageUrls.length == images.length) {
-          //   handleUpdateData('', caption, imageUrls, 2);
-          // }
         }).catchError((err) {
           print(err);
         });
       }
     } else {
-      print('here ok boss');
-      Fluttertoast.showToast(msg: "Nothing to update");
-      setState(() {
-        isLoading = false;
-      });
+      if (picUrls.isNotEmpty) {
+        handleUpdateData('', caption, picUrls, 2);
+      } else {
+        Fluttertoast.showToast(msg: 'Select Some Images');
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
-  void handleUpdateData(
-      String content, String caption, var url, type) {
-    // print('Con:$content');
-    // print('Cap:$caption');
+  //update post in firebase
+
+  void handleUpdateData(String content, String caption, var url, type) {
     focusNodeText.unfocus();
-    focusNodeCameraCap.unfocus();
     focusNodeGalleryCap.unfocus();
 
     setState(() {
       isLoading = true;
     });
 
-    if (type == 0 ? content != widget.content : (caption != widget.caption)) {
+    if (type == 0
+        ? content != widget.content
+        : (caption != widget.caption ||
+            images.isNotEmpty ||
+            picUrls.length != widget.urls.length)) {
       Firestore.instance
-          .collection('Stories')
-          .document('12')
-          .collection('12')
+          .collection('Posts')
           .document(widget.code)
           .updateData({
         'content': content,
         'caption': caption,
-        'urls': url
+        'urls': url,
+        'timestamp':DateTime.now().millisecondsSinceEpoch.toString(),
+
       }).then((data) async {
         setState(() {
           isLoading = false;
@@ -174,7 +106,7 @@ class _EditPostState extends State<EditPost> {
         Fluttertoast.showToast(msg: err.toString());
       });
     } else {
-      Fluttertoast.showToast(msg: 'Nothing to Update');
+      Fluttertoast.showToast(msg: 'No any changes to Update');
       setState(() {
         isLoading = false;
       });
@@ -191,14 +123,13 @@ class _EditPostState extends State<EditPost> {
   readLocal() {
     widget.type == 0 && widget.type != 2
         ? text = widget.content ?? ''
-        : photoUrl = widget.content ?? '';
-    widget.type == 2
-        ? galleryCap = widget.caption ?? ''
-        : cameraCap = widget.caption ?? '';
-    // pUrls = widget.urls;
+         :galleryCap = widget.caption ?? '';
+    if (widget.type == 2) {
+      picUrls =
+          List.generate(widget.urls.length, (index) => widget.urls[index]);
+    }
 
     editTextPost = new TextEditingController(text: text);
-    editTextCameraCaption = new TextEditingController(text: cameraCap);
     editTextGalleryCaption = new TextEditingController(text: galleryCap);
 
     // Force refresh input
@@ -216,42 +147,26 @@ class _EditPostState extends State<EditPost> {
   }
 
   Widget mainContent(context) {
-    print('camera:$cameraImageFile');
-    print('camera2:$images');
-    print('length:${images.length}');
-    // print('text:${editTextPost.text}');
-    print('photoUrl:$photoUrl');
-    print('captionCam:$cameraCap');
-    print('text:$text');
-    print('captionGal:$galleryCap');
-    print('urls:${widget.urls}');
-    print('type:${widget.type}');
     return Stack(
       fit: StackFit.expand,
       children: [
-        // (photoUrl != null && widget.type == 1 )|| (cameraImageFile != null)
-        //     ? getCameraPhoto(context)
-        //     :
         widget.urls != null && widget.type == 2
             ? getGalleryPhoto(context)
             : text != null
                 ? Container(
                     margin: EdgeInsets.only(bottom: 65),
-                    // padding: EdgeInsets.only(bottom: 15),
                     child: SingleChildScrollView(
                       child: Container(
-                        // height: config.App(context).appHeight(80),
                         child: Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: TextField(
                             maxLines: null,
-                            // expands: true,
                             keyboardType: TextInputType.multiline,
                             style:
                                 TextStyle(color: Colors.black, fontSize: 20.0),
                             controller: editTextPost,
                             onChanged: (value) {
-                              text = value;
+                              text = value.trim();
                             },
                             focusNode: focusNodeText,
                             decoration: new InputDecoration(
@@ -291,11 +206,11 @@ class _EditPostState extends State<EditPost> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FlatButton(
+                    highlightColor: Colors.green,
                     minWidth: config.App(context).appWidth(40),
                     onPressed: () {
                       validInputs();
                     },
-                    // padding: EdgeInsets.symmetric(vertical: 14),
                     color: Colors.lightBlue,
                     shape: StadiumBorder(),
                     child: Padding(
@@ -307,33 +222,18 @@ class _EditPostState extends State<EditPost> {
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      // IconButton(
-                      //   icon: Icon(
-                      //     Icons.camera_alt,
-                      //     size: 28,
-                      //     color: Colors.lightBlue,
-                      //   ),
-                      //   onPressed: () {
-                      //     getCameraImage();
-                      //   },
-                      // ),
-                      // SizedBox(
-                      //   width: 15,
-                      // ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.photo,
-                          size: 28,
-                          color: Colors.lightBlue,
-                        ),
-                        onPressed: () {
-                          loadAssets();
-                        },
-                      ),
-                    ],
-                  )
+                  widget.type != 0
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.photo,
+                            size: 28,
+                            color: Colors.lightBlue,
+                          ),
+                          onPressed: () {
+                            loadAssets();
+                          },
+                        )
+                      : Container()
                 ],
               ),
             ),
@@ -344,110 +244,6 @@ class _EditPostState extends State<EditPost> {
     );
   }
 
-//   Widget getCameraPhoto(context) {
-//     return Container(
-//       margin: EdgeInsets.only(bottom: 65),
-//       child: SingleChildScrollView(
-//         child: Column(
-//           children: [
-//             Container(
-//               // height: config.App(context).appHeight(80),
-//               child: Padding(
-//                 padding: const EdgeInsets.all(5.0),
-//                 child: TextField(
-//                   maxLines: null,
-//                   // expands: true,
-//                   keyboardType: TextInputType.multiline,
-//                   style: TextStyle(color: Colors.black, fontSize: 18.0),
-//                   controller: editTextCameraCaption,
-//                   onChanged: (value) {
-//                     cameraCap = value;
-//                   },
-//                   focusNode: focusNodeCameraCap,
-//                   decoration: new InputDecoration(
-//                     border: InputBorder.none,
-//                     focusedBorder: InputBorder.none,
-//                     enabledBorder: InputBorder.none,
-//                     errorBorder: InputBorder.none,
-//                     disabledBorder: InputBorder.none,
-//                     hintText: "Say Something About Image",
-//                     hintStyle: TextStyle(color: Colors.grey),
-//                     contentPadding: EdgeInsets.all(5.0),
-//                   ),
-//                   textAlign: TextAlign.start,
-//                   autofocus: false,
-//                 ),
-//               ),
-//             ),
-//             photoUrl != null
-//                 ? Container(
-//                     height: config.App(context).appHeight(70),
-//                     margin: EdgeInsets.all(10.0),
-//                     decoration: BoxDecoration(
-// //                              border: Border.all(width : 10.0,color: Colors.transparent),
-//                         borderRadius: BorderRadius.circular(0.0),
-//                         boxShadow: [
-//                           BoxShadow(
-//                               color: Color.fromARGB(80, 0, 0, 0),
-//                               blurRadius: 5.0,
-//                               offset: Offset(5.0, 5.0))
-//                         ],
-//                         image: DecorationImage(
-//                             fit: BoxFit.cover,
-//                             image: NetworkImage(photoUrl))),
-//                     width: MediaQuery.of(context).size.width,
-//                     child: Container(
-//                       margin: EdgeInsets.only(top: 5.0, right: 5),
-//                       alignment: Alignment.topRight,
-//                       child: GestureDetector(
-//                         onTap: () => _clear(),
-//                         child: CircleAvatar(
-//                           radius: 15,
-//                           child: Icon(
-//                             Icons.clear,
-//                             color: Colors.white,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   )
-//                 : cameraImageFile!= null? Container(
-//                     height: config.App(context).appHeight(70),
-//                     margin: EdgeInsets.all(10.0),
-//                     decoration: BoxDecoration(
-// //                              border: Border.all(width : 10.0,color: Colors.transparent),
-//                         borderRadius: BorderRadius.circular(0.0),
-//                         boxShadow: [
-//                           BoxShadow(
-//                               color: Color.fromARGB(80, 0, 0, 0),
-//                               blurRadius: 5.0,
-//                               offset: Offset(5.0, 5.0))
-//                         ],
-//                         image: DecorationImage(
-//                             fit: BoxFit.cover,
-//                             image: FileImage(cameraImageFile))),
-//                     width: MediaQuery.of(context).size.width,
-//                     child: Container(
-//                       margin: EdgeInsets.only(top: 5.0, right: 5),
-//                       alignment: Alignment.topRight,
-//                       child: GestureDetector(
-//                         onTap: () => _clear(),
-//                         child: CircleAvatar(
-//                           radius: 15,
-//                           child: Icon(
-//                             Icons.clear,
-//                             color: Colors.white,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ):Container(child: Text('No Image'),),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
   Widget getGalleryPhoto(context) {
     return Container(
       margin: EdgeInsets.only(bottom: 65),
@@ -455,17 +251,15 @@ class _EditPostState extends State<EditPost> {
         child: Column(
           children: [
             Container(
-              // height: config.App(context).appHeight(80),
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: TextField(
                   maxLines: null,
-                  // expands: true,
                   keyboardType: TextInputType.multiline,
                   style: TextStyle(color: Colors.black, fontSize: 18.0),
                   controller: editTextGalleryCaption,
                   onChanged: (value) {
-                    galleryCap = value;
+                    galleryCap = value.trim();
                   },
                   focusNode: focusNodeGalleryCap,
                   decoration: new InputDecoration(
@@ -483,16 +277,15 @@ class _EditPostState extends State<EditPost> {
                 ),
               ),
             ),
-            widget.urls != null ? buildNewGridView() : Container,
             images.isNotEmpty
                 ? Column(
                     children: [
                       SizedBox(
-                        height: 10,
+                        height: 8,
                       ),
                       Divider(
-                        thickness: 2,
-                        color: Colors.black,
+                        thickness: 1.5,
+                        color: Colors.grey,
                       ),
                       SizedBox(
                         height: 5,
@@ -505,9 +298,14 @@ class _EditPostState extends State<EditPost> {
                         height: 10,
                       ),
                       buildGridView(),
+                      Divider(
+                        thickness: 1.5,
+                        color: Colors.grey,
+                      ),
                     ],
                   )
                 : Container(),
+            picUrls != null ? buildNewGridView() : Container,
           ],
         ),
       ),
@@ -530,44 +328,18 @@ class _EditPostState extends State<EditPost> {
   }
 
   void validInputs() {
-    // if(widget.type == 1 &&(cameraImageFile!=null || photoUrl!=null)){
-    //   print('m here C');
-    //   setState(() {
-    //     this.isLoading = true;
-    //   });
-    //   uploadCameraFile(cameraCap);
-    // }else
-    if (images.length != 0 || widget.urls != null) {
+    if (widget.type == 2 && (images.length != 0 || picUrls != null)) {
       setState(() {
         this.isLoading = true;
       });
       uploadGalleryImages(galleryCap);
     } else {
-      handleUpdateData(text, '', null, 0);
+      if (widget.type == 0 && text != '') {
+        handleUpdateData(text, '', null, 0);
+      } else {
+        Fluttertoast.showToast(msg: 'Post Cannot be empty');
+      }
     }
-    // if (editTextPost.text.trim() != '' && cameraImageFile == null) {
-    //   // setState(() {
-    //   //   this.isLoading = true;
-    //   // });
-    //   print('m here T');
-    //   handleUpdateData(text, '', null);
-    //   // onPostData(editTextPost.text, 0, '', null);
-    // } else if (cameraImageFile != null && editTextPost.text.trim() == '') {
-    //   print('m here C');
-    //   setState(() {
-    //     this.isLoading = true;
-    //   });
-    //   uploadCameraFile(cameraCap);
-    // } else if (images != null &&
-    //     (cameraImageFile == null && editTextPost.text.trim() == '')) {
-    //   print('m here D');
-    //   setState(() {
-    //     this.isLoading = true;
-    //   });
-    //   uploadGalleryImages(editTextGalleryCaption.text);
-    // } else {
-    //   Fluttertoast.showToast(msg: 'Nothing to Post');
-    // }
   }
 
   Future<void> loadAssets() async {
@@ -603,13 +375,13 @@ class _EditPostState extends State<EditPost> {
       images = resultList;
       _error = error;
     });
-    print('images:$images');
   }
 
+  // Show New Images from Picker
   Widget buildGridView() {
     return Container(
         height: images.length <= 2
-            ? config.App(context).appHeight(23)
+            ? config.App(context).appHeight(50)
             : config.App(context).appHeight(75),
         child: GridView.builder(
           scrollDirection: Axis.horizontal,
@@ -620,27 +392,42 @@ class _EditPostState extends State<EditPost> {
               mainAxisSpacing: 0.0),
           itemBuilder: (BuildContext context, int index) {
             Asset asset = images[index];
-            return Card(
-              child: AssetThumb(
-                asset: asset,
-                width: 300,
-                height: 300,
+            return Container(
+              margin: EdgeInsets.all(5.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [
+                  BoxShadow(
+                      color: Color.fromARGB(80, 0, 0, 0),
+                      blurRadius: 5.0,
+                      offset: Offset(5.0, 5.0))
+                ],
+              ),
+              child: ClipRRect(
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                borderRadius: BorderRadius.circular(20.0),
+                child: AssetThumb(
+                  asset: asset,
+                  width: 300,
+                  height: 300,
+                ),
               ),
             );
           },
         ));
   }
 
+  //Show Existing Images in Post
   Widget buildNewGridView() {
     return Container(
-        height: widget.urls.length <= 2
-            ? config.App(context).appHeight(23)
+        height: picUrls.length <= 2
+            ? config.App(context).appHeight(50)
             : config.App(context).appHeight(75),
         child: GridView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: widget.urls.length,
+          itemCount: picUrls.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: widget.urls.length <= 2 ? 1 : 3,
+              crossAxisCount: picUrls.length <= 2 ? 1 : 3,
               crossAxisSpacing: 4.0,
               mainAxisSpacing: 0.0),
           itemBuilder: (BuildContext context, int index) {
@@ -649,8 +436,7 @@ class _EditPostState extends State<EditPost> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            FullPhoto(url: widget.urls[index])));
+                        builder: (context) => FullPhoto(url: picUrls[index])));
               },
               child: Container(
                 margin: EdgeInsets.all(5.0),
@@ -665,18 +451,17 @@ class _EditPostState extends State<EditPost> {
                     ],
                     image: DecorationImage(
                         fit: BoxFit.cover,
-                        image: CachedNetworkImageProvider(widget.urls[index]))),
+                        image: CachedNetworkImageProvider(picUrls[index]))),
                 width: MediaQuery.of(context).size.width,
                 child: Container(
                   margin: EdgeInsets.only(top: 5.0, right: 5),
                   alignment: Alignment.topRight,
                   child: InkWell(
+                    highlightColor: Colors.red,
                     onTap: () {
                       setState(() {
-                        widget.urls[index] = null;
+                        picUrls.removeAt(index);
                       });
-
-                      // print('ji:${widget.urls[index]}');
                     },
                     child: CircleAvatar(
                       radius: 15,

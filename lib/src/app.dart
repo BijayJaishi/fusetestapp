@@ -11,17 +11,8 @@ class MyApp extends StatelessWidget {
   DateTime currentBackPressTime;
   var length;
 
-  List<Choice> choices = const <Choice>[
-    const Choice(title: 'Edit Post', icon: Icons.edit),
-  ];
-
-  onItemMenuPress(choice) {
-    if (choice.title == 'Edit Post') {}
-  }
-
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       backgroundColor: config.Colors().secondDarkColor(1),
       appBar: AppBar(
@@ -75,6 +66,7 @@ class MyApp extends StatelessWidget {
               ),
               Expanded(
                 child: InkWell(
+                  splashColor: Colors.transparent,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -100,9 +92,7 @@ class MyApp extends StatelessWidget {
         ),
         StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance
-              .collection('Stories')
-              .document('12')
-              .collection('12')
+              .collection('Posts')
               .orderBy('timestamp', descending: true)
               .snapshots(),
           builder:
@@ -138,9 +128,8 @@ class MyApp extends StatelessWidget {
                       index, snapshot.data.documents[index], context),
                   itemCount: snapshot.data.documents.length,
                   shrinkWrap: true,
-                  // todo comment this out and check the result
                   physics:
-                      ClampingScrollPhysics(), // todo comment this out and check the result
+                      ClampingScrollPhysics(),
                 );
               }
             }
@@ -188,43 +177,22 @@ class MyApp extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => EditPost(
-                                document['type'],
-                                document['content'],
-                                document['caption'],
-                                document['postId'],
-                                document['urls'])));
-                  })
-              // PopupMenuButton<Choice>(
-              //   onSelected: onItemMenuPress,
-              //   itemBuilder: (BuildContext context) {
-              //     return choices.map((Choice choice) {
-              //       return PopupMenuItem<Choice>(
-              //           value: choice,
-              //           child: Row(
-              //             children: <Widget>[
-              //               Icon(
-              //                 choice.icon,
-              //                 color: Colors.black,
-              //               ),
-              //               Container(
-              //                 width: 10.0,
-              //               ),
-              //               Text(
-              //                 choice.title,
-              //                 style: TextStyle(color: Colors.black),
-              //               ),
-              //             ],
-              //           ));
-              //     }).toList();
-              //   },
-              // ),
+              Card(
+                child: IconButton(
+                  highlightColor: Colors.green,
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditPost(
+                                  document['type'],
+                                  document['content'],
+                                  document['caption'],
+                                  document['postId'],
+                                  document['urls'])));
+                    }),
+              )
             ],
           ),
           Divider(
@@ -237,81 +205,12 @@ class MyApp extends StatelessWidget {
                       top: 4.0, left: 10, right: 10, bottom: 10),
                   child: Text(
                     document['content'],
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontStyle: FontStyle.normal),
                   ),
                 )
-              // : (document['type'] == 1)
-              //     ? Column(
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           document['caption'] != ''
-              //               ? Container(
-              //                   child: Padding(
-              //                     padding: const EdgeInsets.only(
-              //                         top: 4.0,
-              //                         left: 10,
-              //                         right: 10,
-              //                         bottom: 10),
-              //                     child: Text(
-              //                       document['caption'],
-              //                     ),
-              //                   ),
-              //                 )
-              //               : Container(),
-              //           Container(
-              //             child: FlatButton(
-              //               child: Material(
-              //                 child: CachedNetworkImage(
-              //                   placeholder: (context, url) => Center(
-              //                     child: Container(
-              //                       child: CircularProgressIndicator(
-              //                         valueColor: AlwaysStoppedAnimation<Color>(
-              //                             Colors.lightBlue),
-              //                       ),
-              //                       width: 200.0,
-              //                       height: 200.0,
-              //                       padding: EdgeInsets.all(70.0),
-              //                       decoration: BoxDecoration(
-              //                         color: Colors.transparent,
-              //                         borderRadius: BorderRadius.all(
-              //                           Radius.circular(8.0),
-              //                         ),
-              //                       ),
-              //                     ),
-              //                   ),
-              //                   errorWidget: (context, url, error) => Material(
-              //                     child: Image.asset(
-              //                       'assets/img_not_available.jpeg',
-              //                       width: double.infinity,
-              //                       height: 250,
-              //                       fit: BoxFit.cover,
-              //                     ),
-              //                     borderRadius: BorderRadius.all(
-              //                       Radius.circular(8.0),
-              //                     ),
-              //                     clipBehavior: Clip.hardEdge,
-              //                   ),
-              //                   imageUrl: document['content'],
-              //                   height: 250,
-              //                   width: double.infinity,
-              //                   fit: BoxFit.cover,
-              //                 ),
-              //                 borderRadius:
-              //                     BorderRadius.all(Radius.circular(8.0)),
-              //                 clipBehavior: Clip.hardEdge,
-              //               ),
-              //               onPressed: () {
-              //                 Navigator.push(
-              //                     context,
-              //                     MaterialPageRoute(
-              //                         builder: (context) =>
-              //                             FullPhoto(url: document['content'])));
-              //               },
-              //               padding: EdgeInsets.only(
-              //                   bottom: 3, left: 3, right: 3, top: 2),
-              //             ),
-              //           )
-              //         ],
-              //       )
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -322,100 +221,98 @@ class MyApp extends StatelessWidget {
                                   top: 4.0, left: 10, right: 10, bottom: 10),
                               child: Text(
                                 document['caption'],
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FontStyle.normal),
                               ),
                             ),
                           )
                         : Container(),
                     Container(
-                      width: config.App(context).appWidth(100),
-                      height: document['urls'].length == 2
-                          ? config.App(context).appWidth(50)
-                          : config.App(context).appWidth(96),
-                      child: GridView.builder(
-                        scrollDirection:Axis.horizontal,
-                              itemCount:
-                        // document['urls'].length >= 4
-                              //     ? 4
-                              //     :
-                            document['urls'].length,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: document['urls'].length <= 2?1:2,
-                                      crossAxisSpacing: 4.0,
-                                      mainAxisSpacing: 4.0),
-                              itemBuilder: (BuildContext context, int index) {
-                                return InkWell(
-                                  highlightColor: Colors.lightBlue,
-                                  onTap: (){
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                FullPhoto(url: document['urls'][index])));
-                                  },
-                                  child: Container(
-                                      decoration: BoxDecoration(
-                                     border: Border.all(width : 4.0,color: Colors.transparent),
-                                        borderRadius: BorderRadius.circular(20.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Color.fromARGB(60, 0, 0, 0),
-                                              blurRadius: 5.0,
-                                              offset: Offset(5.0, 5.0)
-                                          )
-                                        ],
-                                      ),
-                                    margin: EdgeInsets.all(5),
-                                    child: Material(
-                                      elevation: 4,
-                                      child:
-                                      CachedNetworkImage(
-                                        placeholder: (context, url) => Center(
-                                          child: Container(
-                                            child: CircularProgressIndicator(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                      Colors.lightBlue),
-                                            ),
-                                            width: 200.0,
-                                            height: 200.0,
-                                            padding: EdgeInsets.all(70.0),
-                                            decoration: BoxDecoration(
-                                              color: Colors.transparent,
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(20.0),
-                                              ),
-                                            ),
-                                          ),
+                        width: config.App(context).appWidth(100),
+                        height: document['urls'].length == 2
+                            ? config.App(context).appWidth(50)
+                            : config.App(context).appWidth(96),
+                        child: GridView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: document['urls'].length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount:
+                                      document['urls'].length <= 2 ? 1 : 2,
+                                  crossAxisSpacing: 4.0,
+                                  mainAxisSpacing: 4.0),
+                          itemBuilder: (BuildContext context, int index) {
+                            return InkWell(
+                              highlightColor: Colors.lightBlue,
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => FullPhoto(
+                                            url: document['urls'][index])));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 4.0, color: Colors.transparent),
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Color.fromARGB(60, 0, 0, 0),
+                                        blurRadius: 5.0,
+                                        offset: Offset(5.0, 5.0))
+                                  ],
+                                ),
+                                margin: EdgeInsets.all(5),
+                                child: Material(
+                                  elevation: 4,
+                                  child: CachedNetworkImage(
+                                    placeholder: (context, url) => Center(
+                                      child: Container(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.lightBlue),
                                         ),
-                                        errorWidget: (context, url, error) =>
-                                            Material(
-                                          child: Image.asset(
-                                            'assets/img_not_available.jpeg',
-                                            width: double.infinity,
-                                            height: 250,
-                                            fit: BoxFit.cover,
-                                          ),
+                                        width: 200.0,
+                                        height: 200.0,
+                                        padding: EdgeInsets.all(70.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.transparent,
                                           borderRadius: BorderRadius.all(
                                             Radius.circular(20.0),
                                           ),
-                                          clipBehavior: Clip.hardEdge,
                                         ),
-                                        imageUrl: document['urls'][index],
-                                        height: 250,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Material(
+                                      child: Image.asset(
+                                        'assets/img_not_available.jpeg',
                                         width: double.infinity,
+                                        height: 250,
                                         fit: BoxFit.cover,
                                       ),
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(20.0)),
+                                        Radius.circular(20.0),
+                                      ),
                                       clipBehavior: Clip.hardEdge,
                                     ),
+                                    imageUrl: document['urls'][index],
+                                    height: 250,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
                                   ),
-                                );
-                              },
-                            )
-
-                    ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                              ),
+                            );
+                          },
+                        )),
                   ],
                 )
         ],
@@ -440,11 +337,4 @@ class MyApp extends StatelessWidget {
     }
     return Future.value(true);
   }
-}
-
-class Choice {
-  const Choice({this.title, this.icon});
-
-  final String title;
-  final IconData icon;
 }
