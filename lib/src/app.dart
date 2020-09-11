@@ -95,6 +95,7 @@ class MyApp extends StatelessWidget {
               .collection('Posts')
               .document('12').collection('12')
               .orderBy('timestamp', descending: true)
+          .limit(50)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
