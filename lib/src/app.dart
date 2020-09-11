@@ -93,6 +93,7 @@ class MyApp extends StatelessWidget {
         StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance
               .collection('Posts')
+              .document('12').collection('12')
               .orderBy('timestamp', descending: true)
               .snapshots(),
           builder:

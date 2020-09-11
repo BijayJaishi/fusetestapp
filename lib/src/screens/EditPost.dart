@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:fusetestapp/config/appConfig.dart' as config;
+import 'package:image_picker/image_picker.dart';
 
 import '../app.dart';
 import 'FullPhoto.dart';
@@ -83,6 +84,7 @@ class _EditPostState extends State<EditPost> {
             picUrls.length != widget.urls.length)) {
       Firestore.instance
           .collection('Posts')
+          .document('12').collection('12')
           .document(widget.code)
           .updateData({
         'content': content,

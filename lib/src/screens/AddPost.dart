@@ -54,7 +54,7 @@ class _AddPostState extends State<AddPost> {
     focusNodeGalleryCap.unfocus();
 
     var documentReference =
-        Firestore.instance.collection('Posts').document(code.toString());
+        Firestore.instance.collection('Posts').document('12').collection('12').document(code.toString());
 
     Firestore.instance.runTransaction((transaction) async {
       await transaction.set(
